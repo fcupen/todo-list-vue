@@ -150,6 +150,7 @@ export default class Home extends Vue {
 
   mounted() {
     this.todos = JSON.parse(JSON.stringify(this.store.state.todos));
+    this.store.commit("UPDATE_ALL_TODO", this.todos);
 
     document.addEventListener("DOMContentLoaded", function () {
       var elems = document.querySelectorAll(".tooltipped");
