@@ -20,73 +20,70 @@
   </div>
   <ul class="collection">
     <li class="collection-header"><h4>ToDo List</h4></li>
-    <li
-      class="collection-item"
-      :class="{ 'teal darken-1 white-text': t.check }"
-      v-for="(t, index) in todos"
-      :key="index"
+    <draggable
+      v-model="todos"
+      @start="drag = true"
+      @end="drag = false"
+      item-key="todo"
+      @change="log"
     >
-      <div v-if="isEdit !== index">
-        <div class="flex">
-          <i
-            @click="move(-1, index)"
-            class="cursor-pointer material-icons"
-            :class="{ 'white-text': t.check }"
-          >
-            arrow_upward
-          </i>
-          <i
-            @click="move(1, index)"
-            class="cursor-pointer material-icons"
-            :class="{ 'white-text': t.check }"
-          >
-            arrow_downward
-          </i>
-          <div class="cursor-pointer w100" @click="check(index)">
-            {{ t.todo }}
-          </div>
-          <a class="secondary-content flex">
-            <i
-              @click="
-                isEdit = index;
-                todoToUpdate = t;
-              "
-              class="cursor-pointer material-icons"
-              :class="{ 'white-text': t.check }"
-            >
-              edit
-            </i>
-            <i
-              @click="deleteTodo(index)"
-              class="cursor-pointer material-icons"
-              :class="{ 'white-text': t.check }"
-            >
-              delete
-            </i>
-          </a>
-        </div>
-      </div>
-      <div v-if="isEdit === index">
-        <div class="w100 input-field col s12">
-          <input
-            :placeholder="todoToUpdate.todo"
-            v-model="todoToUpdate.todo"
-            type="text"
-            class="validate"
-          />
-        </div>
-        <button @click="updateTodo(index)" class="waves-effect waves-light btn">
-          Update
-        </button>
-        <button
-          style="margin-left: 1em"
-          @click="isEdit = -1"
-          class="waves-effect waves-light btn red lighten-4"
+      <template #item="{ element, index }">
+        <li
+          class="collection-item"
+          :class="{ 'teal darken-1 white-text': element.check }"
         >
-          Close
-        </button>
-      </div>
-    </li>
+          <div v-if="isEdit !== index">
+            <div class="flex">
+              <div class="cursor-pointer w100" @click="check(index)">
+                {{ element.todo }}
+              </div>
+              <a class="secondary-content flex">
+                <i
+                  @click="
+                    isEdit = index;
+                    todoToUpdate = element;
+                  "
+                  class="cursor-pointer material-icons"
+                  :class="{ 'white-text': element.check }"
+                >
+                  edit
+                </i>
+                <i
+                  @click="deleteTodo(index)"
+                  class="cursor-pointer material-icons"
+                  :class="{ 'white-text': element.check }"
+                >
+                  delete
+                </i>
+              </a>
+            </div>
+          </div>
+          <div v-if="isEdit === index">
+            <div class="w100 input-field col s12">
+              <input
+                :placeholder="todoToUpdate.todo"
+                v-model="todoToUpdate.todo"
+                type="text"
+                class="validate"
+              />
+            </div>
+            <button
+              @click="updateTodo(index)"
+              class="waves-effect waves-light btn"
+            >
+              Update
+            </button>
+            <button
+              style="margin-left: 1em"
+              @click="isEdit = -1"
+              class="waves-effect waves-light btn red lighten-4"
+            >
+              Close
+            </button>
+          </div>
+        </li>
+      </template>
+    </draggable>
   </ul>
 </template>
 
@@ -94,20 +91,36 @@
 import { computed } from "vue";
 import { Options, Vue } from "vue-class-component";
 import { useStore } from "vuex";
+import draggable from "vuedraggable";
 
 declare var M: any;
 
 @Options({
-  components: {},
+  components: {
+    draggable,
+  },
+  // watch: {
+  //   todos(arr) {
+  //     this.todos2 = arr;
+  //   },
+  // },
 })
 export default class Home extends Vue {
+  drag = false;
+
   todos: any = [];
+  // todos2: any = [];
   todo = "";
   todoToUpdate = {};
 
   isEdit = -1;
 
   store = useStore();
+  log() {
+    
+    this.store.commit("UPDATE_ALL_TODO", this.todos);
+    this.showToast("Item moved");
+  }
   save() {
     this.store.commit("ADD_TODO", [{ todo: this.todo, check: false }]);
     this.todo = "";
@@ -132,15 +145,22 @@ export default class Home extends Vue {
     this.showToast("Updated");
     this.todoToUpdate = {};
   }
-  move(direction: number, id: number) { 
-    var todo = this.todos.splice(id, 1);
-    this.todos.splice(Math.abs(id + 1 * direction), 0, todo[0]); 
-    this.store.commit("UPDATE_ALL_TODO", this.todos);
-    this.showToast("Item moved");
-  }
   created() {
-    this.todos = computed(() => this.store.state.todos);
     this.store.dispatch("GET_TODOS");
+    // this.todos = JSON.parse(JSON.stringify(this.store.state.todos));
+    // this.todos2 = JSON.parse(
+    //   JSON.stringify(
+    //     computed(() => {
+    //       // this.todos2 = this.store.state.todos;
+    //       return this.store.state.todos;
+    //     })
+    //   )
+    // );
+
+  }
+
+  mounted() {
+    this.todos = JSON.parse(JSON.stringify(this.store.state.todos));
   }
 
   showToast(msg: string) {
