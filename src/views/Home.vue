@@ -99,17 +99,11 @@ declare var M: any;
   components: {
     draggable,
   },
-  // watch: {
-  //   todos(arr) {
-  //     this.todos2 = arr;
-  //   },
-  // },
 })
 export default class Home extends Vue {
   drag = false;
 
-  todos: any = [];
-  // todos2: any = [];
+  todos: any = []
   todo = "";
   todoToUpdate = {};
 
@@ -117,7 +111,6 @@ export default class Home extends Vue {
 
   store = useStore();
   log() {
-    
     this.store.commit("UPDATE_ALL_TODO", this.todos);
     this.showToast("Item moved");
   }
@@ -147,16 +140,6 @@ export default class Home extends Vue {
   }
   created() {
     this.store.dispatch("GET_TODOS");
-    // this.todos = JSON.parse(JSON.stringify(this.store.state.todos));
-    // this.todos2 = JSON.parse(
-    //   JSON.stringify(
-    //     computed(() => {
-    //       // this.todos2 = this.store.state.todos;
-    //       return this.store.state.todos;
-    //     })
-    //   )
-    // );
-
   }
 
   mounted() {
