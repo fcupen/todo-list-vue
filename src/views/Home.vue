@@ -30,10 +30,16 @@
       <template #item="{ element, index }">
         <li
           class="collection-item"
-          :class="{ 'teal darken-1 white-text': element.check }"
+          :class="{ 'teal darken-1 white-text text-checked': element.check }"
         >
           <div v-if="isEdit !== index">
-            <div class="flex">
+            <div
+              class="flex"
+              :class="{ tooltipped: !element.check && index === 0 }"
+              data-position="top"
+              data-tooltip="Current to do"
+            >
+              <div class="lds-dual-ring" v-if="index === 0"></div>
               <div class="cursor-pointer w100" @click="check(index)">
                 {{ element.todo }}
               </div>
@@ -103,7 +109,7 @@ declare var M: any;
 export default class Home extends Vue {
   drag = false;
 
-  todos: any = []
+  todos: any = [];
   todo = "";
   todoToUpdate = {};
 
@@ -144,6 +150,12 @@ export default class Home extends Vue {
 
   mounted() {
     this.todos = JSON.parse(JSON.stringify(this.store.state.todos));
+
+    document.addEventListener("DOMContentLoaded", function () {
+      var elems = document.querySelectorAll(".tooltipped");
+      var instances = M.Tooltip.init(elems);
+      // instances[0].open();
+    });
   }
 
   showToast(msg: string) {

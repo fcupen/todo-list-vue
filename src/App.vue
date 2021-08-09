@@ -1,6 +1,6 @@
 <template>
   <div id="nav">
-    <router-link to="/">ToDo List</router-link> 
+    <router-link to="/">ToDo List</router-link>
     <!-- |
     <router-link to="/about">About</router-link> -->
   </div>
@@ -40,4 +40,36 @@
 .w100 {
   width: 100%;
 }
+.text-checked {
+  text-decoration: line-through;
+}
+
+
+
+.lds-dual-ring {
+  position: absolute;
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 14px;
+  height: 14px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 2px solid #42b983;
+  border-color: #42b983 transparent #42b983 transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 </style>
